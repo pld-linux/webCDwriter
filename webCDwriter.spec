@@ -1,3 +1,7 @@
+
+%define	CDWuser		webcdwriter
+%define	CDWgroup	cdwrite
+
 Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
@@ -10,6 +14,7 @@ Source0:	http://JoergHaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
 # Source0Download: http://joerghaeger.de/webCDwriter/TARs.html
 Source1:	%{name}.init
 URL:		http://JoergHaeger.de/webCDwriter/
+BuildRequires:	rpmbuild(macros) >= 1.159
 Requires(pre):	/bin/chown
 Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/find
@@ -23,10 +28,9 @@ Requires(postun):	/usr/sbin/groupdel
 Requires:	cdrtools
 Requires:	mkisofs
 Requires:	mpg123
+Provides:	group(%{CDWgroup})
+Provides:	user(%{CDWuser})
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
-
-%define	CDWuser		webcdwriter
-%define	CDWgroup	cdwrite
 
 %description
 webCDwriter can be used to make a single CD-writer available to the
@@ -86,22 +90,22 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/CDWserver
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-if [ "$1" = 2 ] && ! id -u %{CDWuser} >/dev/null 2>&1 && \
+if [ "$1" = 2 ] && ! /bin/id -u %{CDWuser} >/dev/null 2>&1 && \
    id -u webCDwriter >/dev/null 2>&1; then
-	OLDUID=`id -u webCDwriter`
+	OLDUID=`/bin/id -u webCDwriter`
 	/usr/sbin/usermod -u 109 -d /home/services/CDWserver -m -l webCDwriter %{CDWuser} 1>&2
 	find /home/services/CDWserver -uid $OLDUID -exec chown %{CDWuser} {} \;
 fi
 if [ -n "`/usr/bin/getgid %{CDWgroup}`" ]; then
-	if [ "`getgid %{CDWgroup}`" != "27" ]; then
+	if [ "`/usr/bin/getgid %{CDWgroup}`" != "27" ]; then
 		echo "Error: group %{CDWgroup} doesn't have gid=27. Correct this before installing %{name}." 1>&2
 		exit 1
 	fi
 else
 	/usr/sbin/groupadd -g 27 %{CDWgroup}
 fi
-if [ -n "`id -u %{CDWuser} 2>/dev/null`" ]; then
-	if [ "`id -u %{CDWuser}`" != 109 ]; then
+if [ -n "`/bin/id -u %{CDWuser} 2>/dev/null`" ]; then
+	if [ "`/bin/id -u %{CDWuser}`" != 109 ]; then
 		echo "Error: user %{CDWuser} doesn't have uid=109. Correct this before installing %{name}." 1>&2
 	else
 		/usr/sbin/useradd -u 109 -r -d /home/services/CDWserver -s /bin/false -c "%{name} user" -g %{CDWgroup} %{CDWuser} 1>&2
@@ -126,8 +130,8 @@ fi
 
 %postun
 if [ "$1" = "0" ]; then
-	/usr/sbin/userdel %{CDWuser}
-	/usr/sbin/groupdel %{CDWgroup}
+	%userremove %{CDWuser}
+	%groupremove %{CDWgroup}
 fi
 
 %files
