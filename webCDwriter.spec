@@ -8,6 +8,13 @@ Group:		Networking/Daemons
 Source0:	http://129.70.4.38/download/%{name}-%{version}.tar.bz2
 Source1:	%{name}.init
 URL:		http://www.uni-bielefeld.de/~jhaeger/webCDwriter/
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/bin/id
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/useradd
+Requires(post,preun):	/sbin/chkconfig
+Requires(postun):	/usr/sbin/userdel
+Requires(postun):	/usr/sbin/groupdel
 Requires:	cdrecord >= 1.10
 Requires:	mkisofs
 Requires:	mpg123
@@ -69,47 +76,6 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/CDWserver
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%files
-%defattr(644,root,root,755)
-%doc CREDITS ChangeLog README *.html
-%attr(754,root,root) /etc/rc.d/init.d/CDWserver
-%dir %attr(0755,%{CDWuser},%{CDWgroup}) /etc/CDWserver/
-%attr(0600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/accounts
-%config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/config*
-%attr(4750,root,%{CDWgroup}) %{_bindir}/*
-%attr(755,root,root) %{_sbindir}/CDWserver
-%dir %attr(0700,%{CDWuser},%{CDWgroup}) /var/log/CDWserver/
-%dir %attr(0700,%{CDWuser},%{CDWgroup}) /var/spool/CDWserver/
-# cleanup (and patches) needed
-%dir %attr(0755, %{CDWuser}, %{CDWgroup}) /etc/CDWserver/export/
-/etc/CDWserver/favicon.ico
-/etc/CDWserver/footer
-/etc/CDWserver/greeting
-/etc/CDWserver/header
-/etc/CDWserver/logo.png
-/etc/CDWserver/status.html
-/etc/CDWserver/waitForCD
-/etc/CDWserver/about.html
-/etc/CDWserver/head
-/etc/CDWserver/help*
-/etc/CDWserver/messages*
-/etc/CDWserver/export/*
-/etc/CDWserver/rcdrecord/*
-/etc/CDWserver/webCDcreator/*.html
-/etc/CDWserver/webCDcreator/*.jnlp
-/etc/CDWserver/webCDcreator/4netscape/*
-/etc/CDWserver/webCDcreator/4plugin/*
-/etc/CDWserver/webCDcreator/4pluginRSA/*
-/etc/CDWserver/webCDcreator/doc/*
-/etc/CDWserver/webCDcreator/i18n/*
-/etc/CDWserver/webCDcreator/icons/*
-%dir %attr(0700, %{CDWuser}, %{CDWgroup}) /home/services/CDWserver/
-
-%files rcdrecord
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/files2cd
-%attr(755,root,root) %{_bindir}/rcdrecord
-
 %pre
 if [ -n "`/usr/bin/getgid %{CDWgroup}`" ]; then
 	if [ "`getgid %{CDWgroup}`" != "27" ]; then
@@ -144,3 +110,44 @@ if [ "$1" = "0" ]; then
 	/usr/sbin/userdel %{CDWuser}
 	/usr/sbin/groupdel %{CDWgroup}
 fi
+
+%files
+%defattr(644,root,root,755)
+%doc CREDITS ChangeLog README *.html
+%attr(754,root,root) /etc/rc.d/init.d/CDWserver
+%dir %attr(0755,%{CDWuser},%{CDWgroup}) /etc/CDWserver
+%attr(0600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/accounts
+%config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/config*
+%attr(4754,root,%{CDWgroup}) %{_bindir}/*
+%attr(755,root,root) %{_sbindir}/CDWserver
+%dir %attr(0700,%{CDWuser},%{CDWgroup}) /var/log/CDWserver
+%dir %attr(0700,%{CDWuser},%{CDWgroup}) /var/spool/CDWserver
+# cleanup (and patches) needed
+/etc/CDWserver/favicon.ico
+/etc/CDWserver/footer
+/etc/CDWserver/greeting
+/etc/CDWserver/header
+/etc/CDWserver/logo.png
+/etc/CDWserver/status.html
+/etc/CDWserver/waitForCD
+/etc/CDWserver/about.html
+/etc/CDWserver/head
+/etc/CDWserver/help*
+/etc/CDWserver/messages*
+%dir %attr(0755, %{CDWuser}, %{CDWgroup}) /etc/CDWserver/export
+/etc/CDWserver/export/*
+/etc/CDWserver/rcdrecord
+/etc/CDWserver/webCDcreator/*.html
+/etc/CDWserver/webCDcreator/*.jnlp
+/etc/CDWserver/webCDcreator/4netscape
+/etc/CDWserver/webCDcreator/4plugin
+/etc/CDWserver/webCDcreator/4pluginRSA
+/etc/CDWserver/webCDcreator/doc
+/etc/CDWserver/webCDcreator/i18n
+/etc/CDWserver/webCDcreator/icons
+%dir %attr(0700, %{CDWuser}, %{CDWgroup}) /home/services/CDWserver
+
+%files rcdrecord
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/files2cd
+%attr(755,root,root) %{_bindir}/rcdrecord
