@@ -1,7 +1,7 @@
 Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
-Version:	2.4.2
+Version:	2.4.3
 Release:	0.1
 License:	GPL v2+
 Group:		Networking/Daemons
@@ -76,8 +76,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %attr(0755,%{CDWuser},%{CDWgroup}) /etc/CDWserver/
 %attr(0600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/accounts
 %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/config*
-%attr(4750,root,%{CDWgroup}) %{_bindir}/setScheduler
-%attr(4750,root,%{CDWgroup}) %{_bindir}/CDWverify
+%attr(4750,root,%{CDWgroup}) %{_bindir}/*
 %attr(755,root,root) %{_sbindir}/CDWserver
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) /var/log/CDWserver/
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) /var/spool/CDWserver/
