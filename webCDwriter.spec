@@ -63,7 +63,7 @@ Zdalny klient dla webCDwriter
 	--user=%{CDWuser} \
 	--group=%{CDWgroup}
 
-%{__make} "CXXFLAGS=%{rpmcflags} -Wall -D_REENTRANT"
+%{__make} CXXFLAGS="%{rpmcflags} -Wall -D_REENTRANT"
 
 %install
 rm -rf $RPM_BUILD_ROOT
