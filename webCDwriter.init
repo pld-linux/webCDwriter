@@ -19,10 +19,15 @@
 [ -f /etc/sysconfig/CDWserver ] && . /etc/sysconfig/CDWserver
 
 # Check that networking is up.
-if is_no "${NETWORKING}"; then
-        msg_network_down CDWserver
-        exit 1
+if is_yes "${NETWORKING}"; then
+	if [ ! -f /var/lock/subsys/network ]; then
+		msg_network_down CDWserver
+		exit 1
+	fi
+else
+	exit 0
 fi
+
 
 # See how we were called.
 case "$1" in
@@ -39,26 +44,32 @@ case "$1" in
 	fi
 	;;
   stop)
-	# Stop daemons.
-        if [ -f /var/lock/subsys/CDWserver ]; then
-                msg_stopping CDWserver
+	if [ -f /var/lock/subsys/CDWserver ]; then
+		# Stop daemons.
+		msg_stopping CDWserver
 		killproc CDWserver
+		RETVAL=$?
 		rm -f /var/lock/subsys/CDWserver
-        else
-                msg_not_running CDWserver
-                exit 1
+	else
+		msg_not_running CDWserver
+		exit 1
 	fi
 	;;
-  restart)
+  restart|reload)
 	$0 stop
 	$0 start
+	exit $?
+	;;
+  force-reload)
+	$0 stop && $0 start
+	exit $?
 	;;
   status)
 	status CDWserver
 	exit $?
 	;;
   *)
-	msg_usage "$0 {start|stop|status|restart}"
+	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
 	exit 1
 esac
 
