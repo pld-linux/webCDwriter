@@ -2,17 +2,20 @@ Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
 Version:	2.6.0
-Release:	0.1
+Release:	0.2
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://JoergHaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
 # Source0-md5:	89d79c339fedf1d5960a46e77a70b73c
 Source1:	%{name}.init
 URL:		http://JoergHaeger.de/webCDwriter/
-Requires(pre):	/usr/bin/getgid
+Requires(pre):	/bin/chown
 Requires(pre):	/bin/id
+Requires(pre):	/usr/bin/find
+Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
+Requires(pre):	/usr/sbin/usermod
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/userdel
 Requires(postun):	/usr/sbin/groupdel
@@ -21,8 +24,8 @@ Requires:	mkisofs
 Requires:	mpg123
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define CDWuser webCDwriter
-%define CDWgroup cdwrite
+%define	CDWuser		webcdwriter
+%define	CDWgroup	cdwrite
 
 %description
 webCDwriter can be used to make a single CD-writer available to the
@@ -70,9 +73,9 @@ Zdalny klient dla webCDwriter
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},/etc/rc.d/init.d,/home/services/CDWserver/bin}
 %{__make} \
-    BINDIR=$RPM_BUILD_ROOT%{_bindir} \
-    HOMEBINDIR=$RPM_BUILD_ROOT/home/services/CDWserver/bin \
-    install
+	BINDIR=$RPM_BUILD_ROOT%{_bindir} \
+	HOMEBINDIR=$RPM_BUILD_ROOT/home/services/CDWserver/bin \
+	install
 
 rm -f $RPM_BUILD_ROOT%{_bindir}/*-dummy
 
@@ -82,6 +85,12 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/CDWserver
 rm -rf $RPM_BUILD_ROOT
 
 %pre
+if [ "$1" = 2 ] && ! id -u %{CDWuser} >/dev/null 2>&1 && \
+   id -u webCDwriter >/dev/null 2>&1; then
+	OLDUID=`id -u webCDwriter`
+	/usr/sbin/usermod -u 109 -d /home/services/CDWserver -m -l webCDwriter %{CDWuser} 1>&2
+	find /home/services/CDWserver -uid $OLDUID -exec chown %{CDWuser} {} \;
+fi
 if [ -n "`/usr/bin/getgid %{CDWgroup}`" ]; then
 	if [ "`getgid %{CDWgroup}`" != "27" ]; then
 		echo "Error: group %{CDWgroup} doesn't have gid=27. Correct this before installing %{name}." 1>&2
@@ -90,8 +99,12 @@ if [ -n "`/usr/bin/getgid %{CDWgroup}`" ]; then
 else
 	/usr/sbin/groupadd -g 27 %{CDWgroup}
 fi
-if [ -z "`/bin/id -u %{CDWuser} 2>/dev/null`" ]; then
-	/usr/sbin/useradd -d /home/services/CDWserver -s /bin/false -c "webCDwriter user" -g %{CDWgroup} %{CDWuser}
+if [ -n "`id -u %{CDWuser} 2>/dev/null`" ]; then
+	if [ "`id -u %{CDWuser}`" != 109 ]; then
+		echo "Error: user %{CDWuser} doesn't have uid=109. Correct this before installing %{name}." 1>&2
+	else
+		/usr/sbin/useradd -u 109 -r -d /home/services/CDWserver -s /bin/false -c "%{name} user" -g %{CDWgroup} %{CDWuser} 1>&2
+	fi
 fi
 
 %post
