@@ -7,6 +7,7 @@ License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://JoergHaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
 # Source0-md5:	af9099c1a7befc99f32689baa0e7bedd
+# Source0Download: http://joerghaeger.de/webCDwriter/TARs.html
 Source1:	%{name}.init
 URL:		http://JoergHaeger.de/webCDwriter/
 Requires(pre):	/bin/chown
