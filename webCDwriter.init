@@ -1,12 +1,11 @@
 #!/bin/sh
 #
 # CDWserver	This shell script takes care of starting and stopping
-#		postfix.
+#		CDWserver.
 #
 # chkconfig:	345 90 10
 #
-# description:	Postfix is a Mail Transport Agent, which is the program
-#		that moves mail from one machine to another.
+# description:	CDWserver is a network CD writing tool.
 
 
 # Source function library
