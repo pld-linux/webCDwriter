@@ -1,12 +1,12 @@
 Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
-Version:	2.6.2
+Version:	2.6.6
 Release:	0.1
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://JoergHaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
-# Source0-md5:	d1280b4323aace88742c3bc28fe80e02
+# Source0-md5:	bdc0d5efa2866ae80247ea9fb6d34c0b
 # Source0Download: http://joerghaeger.de/webCDwriter/TARs.html
 Source1:	%{name}.init
 URL:		http://JoergHaeger.de/webCDwriter/
@@ -148,12 +148,12 @@ fi
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) /var/log/CDWserver
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) /var/spool/CDWserver
 # cleanup (and patches) needed
-/etc/CDWserver/export/*
-%dir %attr(0755, %{CDWuser}, %{CDWgroup}) /etc/CDWserver/export
+#/etc/CDWserver/export/*
+#%dir %attr(0755, %{CDWuser}, %{CDWgroup}) /etc/CDWserver/export
 %dir %attr(0700, %{CDWuser}, %{CDWgroup}) /home/services/CDWserver
 %dir %attr(0700, %{CDWuser}, %{CDWgroup}) /home/services/CDWserver/bin
-%attr(0700, %{CDWuser}, %{CDWgroup}) /home/services/CDWserver/bin/*-dummy
-/etc/CDWserver/http
+#%attr(0700, %{CDWuser}, %{CDWgroup}) /home/services/CDWserver/bin/*-dummy
+/var/CDWserver
 
 %files rcdrecord
 %defattr(644,root,root,755)
