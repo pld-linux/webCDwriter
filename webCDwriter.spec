@@ -1,7 +1,7 @@
 Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
-Version:	2.4.3
+Version:	2.4.4
 Release:	0.1
 License:	GPL v2+
 Group:		Networking/Daemons
