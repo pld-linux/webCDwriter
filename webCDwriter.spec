@@ -1,5 +1,5 @@
-Summary:	Network CD Writing tool.
-Summary(pl):	Narzêdzie do sieciowego nagrywania CD.
+Summary:	Network CD Writing tool
+Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
 Version:	2.3
 Release:	1
@@ -28,9 +28,9 @@ line client that trys to offer the functionality of cdrecord over the
 network (not complete yet).
 
 %description -l pl
-webCdwriter mo¿e byæ u¿ywany do udostêpniania pojedyñczej nagrywarki
+webCdwriter mo¿e byæ u¿ywany do udostêpniania pojedynczej nagrywarki
 dla wszystkich u¿ytkowników sieci. Zawiera serwer CDWserver oraz
-klientow: webCDcreator i rcdrecord. CDWserver przechowuje pliki
+klientów: webCDcreator i rcdrecord. CDWserver przechowuje pliki
 transmitowane przez klientów, zarz±dza nagrywark± u¿ywaj±c do tego
 celu cdrecord. webCDcreator jest apletem Javy uruchamianym z
 przegl±darki (Mozilla, Netscape...), pomagaj±cym transmitowaæ pliki.
@@ -51,7 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_bindir}
 %{__make} \
     BINDIR=$RPM_BUILD_ROOT%{_bindir} install
+
 gzip -9nf COPYING CREDITS ChangeLog README *.html
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
