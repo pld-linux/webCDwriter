@@ -1,14 +1,14 @@
 Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
-Version:	2.5.2
+Version:	2.6.0
 Release:	0.1
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://JoergHaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
-# Source0-md5:	6bcf1e09f542635363e74d8450b544b0
+# Source0-md5:	89d79c339fedf1d5960a46e77a70b73c
 Source1:	%{name}.init
-URL:		http://wwwhomes.uni-bielefeld.de/jhaeger/webCDwriter/index.html
+URL:		http://JoergHaeger.de/webCDwriter/
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/groupadd
@@ -68,9 +68,11 @@ Zdalny klient dla webCDwriter
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_bindir},/etc/rc.d/init.d,/home/services/CDWserver}
+install -d $RPM_BUILD_ROOT{%{_bindir},/etc/rc.d/init.d,/home/services/CDWserver/bin}
 %{__make} \
-    BINDIR=$RPM_BUILD_ROOT%{_bindir} install
+    BINDIR=$RPM_BUILD_ROOT%{_bindir} \
+    HOMEBINDIR=$RPM_BUILD_ROOT/home/services/CDWserver/bin \
+    install
 
 rm -f $RPM_BUILD_ROOT%{_bindir}/*-dummy
 
@@ -121,6 +123,9 @@ fi
 %dir %attr(0755,%{CDWuser},%{CDWgroup}) /etc/CDWserver
 %attr(0600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/accounts
 %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/config*
+%config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/greeting
+%config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/waitForCD
+%attr(0600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/password
 %attr(4754,root,%{CDWgroup}) %{_bindir}/*
 %exclude %{_bindir}/files2cd
 %exclude %{_bindir}/image2cd
@@ -129,30 +134,12 @@ fi
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) /var/log/CDWserver
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) /var/spool/CDWserver
 # cleanup (and patches) needed
-/etc/CDWserver/favicon.ico
-/etc/CDWserver/footer
-/etc/CDWserver/greeting
-/etc/CDWserver/header
-/etc/CDWserver/logo.png
-/etc/CDWserver/status.html
-/etc/CDWserver/waitForCD
-/etc/CDWserver/about.html
-/etc/CDWserver/head
-/etc/CDWserver/help*
-/etc/CDWserver/messages*
-%dir %attr(0755, %{CDWuser}, %{CDWgroup}) /etc/CDWserver/export
 /etc/CDWserver/export/*
-/etc/CDWserver/rcdrecord
-/etc/CDWserver/webCDcreator/*.html
-/etc/CDWserver/webCDcreator/*.jnlp
-/etc/CDWserver/webCDcreator/4netscape
-/etc/CDWserver/webCDcreator/4plugin
-/etc/CDWserver/webCDcreator/4pluginRSA
-/etc/CDWserver/webCDcreator/doc
-/etc/CDWserver/webCDcreator/help
-/etc/CDWserver/webCDcreator/i18n
-/etc/CDWserver/webCDcreator/icons
+%dir %attr(0755, %{CDWuser}, %{CDWgroup}) /etc/CDWserver/export
 %dir %attr(0700, %{CDWuser}, %{CDWgroup}) /home/services/CDWserver
+%dir %attr(0700, %{CDWuser}, %{CDWgroup}) /home/services/CDWserver/bin
+%attr(0700, %{CDWuser}, %{CDWgroup}) /home/services/CDWserver/bin/*-dummy
+/etc/CDWserver/http
 
 %files rcdrecord
 %defattr(644,root,root,755)
