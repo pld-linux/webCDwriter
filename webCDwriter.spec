@@ -91,10 +91,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %pre
 if [ "$1" = 2 ] && ! /bin/id -u %{CDWuser} >/dev/null 2>&1 && \
-   id -u webCDwriter >/dev/null 2>&1; then
-	OLDUID=`/bin/id -u webCDwriter`
-	/usr/sbin/usermod -u 109 -d /home/services/CDWserver -m -l webCDwriter %{CDWuser} 1>&2
-	find /home/services/CDWserver -uid $OLDUID -exec chown %{CDWuser} {} \;
+	id -u webCDwriter >/dev/null 2>&1; then
+		OLDUID=`/bin/id -u webCDwriter`
+		/usr/sbin/usermod -u 109 -d /home/services/CDWserver -m -l webCDwriter %{CDWuser} 1>&2
+		find /home/services/CDWserver -uid $OLDUID -exec chown %{CDWuser} {} \;
 fi
 if [ -n "`/usr/bin/getgid %{CDWgroup}`" ]; then
 	if [ "`/usr/bin/getgid %{CDWgroup}`" != "27" ]; then
