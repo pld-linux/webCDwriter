@@ -1,7 +1,7 @@
 Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
-Version:	2.3
+Version:	2.4.1
 Release:	1
 License:	GPL
 Group:		Networking/Daemons
@@ -43,7 +43,6 @@ cdrecord w sieci (jeszcze nie skoñczony).
 %build
 ./configure
 
-
 %{__make}
 
 %install
@@ -52,14 +51,12 @@ install -d $RPM_BUILD_ROOT%{_bindir}
 %{__make} \
     BINDIR=$RPM_BUILD_ROOT%{_bindir} install
 
-gzip -9nf COPYING CREDITS ChangeLog README *.html
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%doc *gz
+%doc COPYING CREDITS ChangeLog README *.html
 %dir %attr(0755, %{CDWuser}, %{CDWgroup}) %{_sysconfdir}/CDWserver/
 %dir %attr(0755, %{CDWuser}, %{CDWgroup}) %{_sysconfdir}/CDWserver/export/
 %config(noreplace) %attr(0600, %{CDWuser}, %{CDWgroup}) %{_sysconfdir}/CDWserver/accounts
@@ -93,37 +90,46 @@ rm -rf $RPM_BUILD_ROOT
 
 %pre
 # Add the "webCDwriter" user and group
-/usr/sbin/groupadd %{CDWgroup} 2> /dev/null || :
-/usr/sbin/useradd -c "webCDwriter user" \
-	-g %{CDWgroup} %{CDWuser} 2> /dev/null || :
+#/usr/sbin/groupadd %{CDWgroup} 2> /dev/null || :
+#/usr/sbin/useradd -c "webCDwriter user" \
+#	-g %{CDWgroup} %{CDWuser} 2> /dev/null || :
 
 %post
 /sbin/chkconfig --add CDWserver
+if [ -f /var/lock/subsys/postfix ]; then
+	/etc/rc.d/init.d/postfix restart >&2
+else
+	echo "Run \"/etc/rc.d/init.d/postfix start\" to start postfix daemon." >&2
+fi
 
 # make cdrecord and mkisofs setuid root
-chown root.%{CDWgroup} /usr/bin/cdrecord /usr/bin/mkisofs
-chmod 4710 /usr/bin/cdrecord /usr/bin/mkisofs
-
-echo
-echo -e "Now you can start CDWserver by"
-echo -e "   service CDWserver start"
-echo -e "Then visit"
-echo -e "   http://`hostname`:12411"
-echo -e "or try rcdrecord or files2cd on the command line."
-echo
+#chown root.%{CDWgroup} /usr/bin/cdrecord /usr/bin/mkisofs
+#chmod 4710 /usr/bin/cdrecord /usr/bin/mkisofs
+#
+#echo
+#echo -e "Now you can start CDWserver by"
+#echo -e "   service CDWserver start"
+#echo -e "Then visit"
+#echo -e "   http://`hostname`:12411"
+#echo -e "or try rcdrecord or files2cd on the command line."
+#echo
 
 %preun
-if [ $1 = 0 ]; then
-	service CDWserver stop || :
-	/sbin/chkconfig --del CDWserver
-	rm /var/spool/CDWserver/* -rf
+if [ "$1" = "0" ]; then
+	if [ -f /var/lock/subsys/postfix ]; then
+		/etc/rc.d/init.d/postfix stop >&2
+	fi
+	/sbin/chkconfig --del postfix
+
+#	if [ -f /var/lock/subsys/web ]; then
+#	service CDWserver stop || :
+#	/sbin/chkconfig --del CDWserver
+#	rm /var/spool/CDWserver/* -rf
 fi
 
 %postun
-if [ "$1" -ge "1" ]; then
-	service CDWserver condrestart
-else
+if [ "$1" = "0" ]; then
 	# reset the owner and mode of cdrecord and mkisofs
-	chgrp root /usr/bin/cdrecord /usr/bin/mkisofs
-	chmod 755 /usr/bin/cdrecord /usr/bin/mkisofs
+	#chgrp root /usr/bin/cdrecord /usr/bin/mkisofs
+	#chmod 755 /usr/bin/cdrecord /usr/bin/mkisofs
 fi
