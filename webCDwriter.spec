@@ -1,12 +1,12 @@
 Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
-Version:	2.6.0
+Version:	2.6.1
 Release:	0.2
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://JoergHaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
-# Source0-md5:	89d79c339fedf1d5960a46e77a70b73c
+# Source0-md5:	af9099c1a7befc99f32689baa0e7bedd
 Source1:	%{name}.init
 URL:		http://JoergHaeger.de/webCDwriter/
 Requires(pre):	/bin/chown
