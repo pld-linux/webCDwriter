@@ -1,12 +1,12 @@
 Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
-Version:	2.5.0
+Version:	2.5.1
 Release:	0.2
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://JoergHaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
-# Source0-md5:	6be42b2c53d72f70c05a9f9cbcada5a1
+# Source0-md5:	29c150a9e04b8ec5d221fed12c5e9d2e
 Source1:	%{name}.init
 URL:		http://wwwhomes.uni-bielefeld.de/jhaeger/webCDwriter/index.html
 Requires(pre):	/usr/bin/getgid
@@ -16,7 +16,7 @@ Requires(pre):	/usr/sbin/useradd
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/userdel
 Requires(postun):	/usr/sbin/groupdel
-Requires:	cdrecord >= 1.10
+Requires:	cdrtools
 Requires:	mkisofs
 Requires:	mpg123
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
