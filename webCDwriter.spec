@@ -6,6 +6,7 @@ Release:	0.2
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://JoergHaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
+# Source0-md5:	6be42b2c53d72f70c05a9f9cbcada5a1
 Source1:	%{name}.init
 URL:		http://wwwhomes.uni-bielefeld.de/jhaeger/webCDwriter/index.html
 Requires(pre):	/usr/bin/getgid
