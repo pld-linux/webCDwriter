@@ -2,7 +2,7 @@ Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
 Version:	2.4.4
-Release:	0.1
+Release:	0.2
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://129.70.4.38/download/%{name}-%{version}.tar.bz2
@@ -71,6 +71,8 @@ install -d $RPM_BUILD_ROOT{%{_bindir},/etc/rc.d/init.d,/home/services/CDWserver}
 %{__make} \
     BINDIR=$RPM_BUILD_ROOT%{_bindir} install
 
+rm -f $RPM_BUILD_ROOT%{_bindir}/*-dummy
+
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/CDWserver
 
 %clean
@@ -119,6 +121,9 @@ fi
 %attr(0600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/accounts
 %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/config*
 %attr(4754,root,%{CDWgroup}) %{_bindir}/*
+%exclude %{_bindir}/files2cd
+%exclude %{_bindir}/image2cd
+%exclude %{_bindir}/rcdrecord
 %attr(755,root,root) %{_sbindir}/CDWserver
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) /var/log/CDWserver
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) /var/spool/CDWserver
@@ -150,4 +155,5 @@ fi
 %files rcdrecord
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/files2cd
+%attr(755,root,root) %{_bindir}/image2cd
 %attr(755,root,root) %{_bindir}/rcdrecord
