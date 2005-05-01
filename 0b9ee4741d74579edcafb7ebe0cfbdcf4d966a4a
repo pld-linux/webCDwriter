@@ -1,0 +1,4 @@
+- remove *-dummy
+- fix %file in rcdrecord
+- don't duplicate files from rcdrecord in main package
+- release 0.2
