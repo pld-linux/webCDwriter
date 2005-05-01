@@ -15,12 +15,14 @@ Source0:	http://joerghaeger.de/webCDwriter/download/%{version}/%{name}-%{version
 # Source0Download: http://joerghaeger.de/webCDwriter/TARs.html
 URL:		http://JoergHaeger.de/webCDwriter/
 
-BuildRequires:	rpmbuild(macros) >= 1.159
+BuildRequires:	rpmbuild(macros) >= 1.202
 BuildRequires:	pam-devel
 BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	binutils
 BuildRequires:	libstdc++-devel
+BuildRequires:	username-comment-in-english
+BuildRequires:	weird-mambo-jumbo-in-post-scriptlet
 
 Requires(pre):	/bin/chown
 Requires(pre):	/bin/id
@@ -99,26 +101,12 @@ fi
 
 %pre
 # Add the "webCDwriter" user and group
-if [ -n "`/usr/bin/getgid %{CDWgroup}`" ]; then
-		if [ "`/usr/bin/getgid %{CDWgroup}`" != "27" ]; then
-			echo "Error: group %{CDWgroup} doesn't have gid=27. Correct this before installing %{name}." 1>&2
-			exit 1
-		fi
-	else
-	/usr/sbin/groupadd -g 27 %{CDWgroup}
-fi
-
-if [ -n "`/bin/id -u %{CDWuser} 2>/dev/null`" ]; then
-		if [ "`/bin/id -u %{CDWuser}`" != 109 ]; then
-			echo "Error: user %{CDWuser} doesn't have uid=109. Correct this before installing %{name}." 1>&2
-			exit 1
-		fi
-	else
-		/usr/sbin/useradd -c "systemowy u¿ytkownik dla %{name}" -u 109 -r -d /home/services/CDWserver -s /bin/false -g %{CDWgroup} %{CDWuser} 1>&2
-fi
+%groupadd -g 27 %{CDWgroup}
+# FIXME ENGLISHE!!!!!!
+%useradd -c "systemowy u¿ytkownik dla %{name}" -u 109 -r -d /home/services/CDWserver -s /bin/false -g %{CDWgroup} %{CDWuser}
 
 %post
-
+# TODO use trigger if it's from pld older package or discard
 # Since rpm will not change the owner of an existing %config file
 %{__chown} %{USER} /etc/CDWserver/accounts 2> /dev/null || :
 %{__chown} %{USER} /etc/CDWserver/config 2> /dev/null || :
@@ -130,17 +118,20 @@ fi
 %{__chown} %{USER} %{_var}/log/CDWserver/log 2> /dev/null || :
 %{__chown} %{USER} %{_var}/log/CDWserver/sessions 2> /dev/null || :
 
+# ????
 if [ -e %{_bindir}/CDWserver-GPL ]; then
 	rm -f %{_bindir}/CDWserver-GPL
 fi
 
- if [ -x /sbin/chkconfig ]; then
- 	/sbin/chkconfig --add CDWserver
- fi
+# use R: not test for -x
+if [ -x /sbin/chkconfig ]; then
+	/sbin/chkconfig --add CDWserver
+fi
 
- if [ -x /sbin/insserv ]; then
- 	/sbin/insserv /etc/rc.d/init.d/CDWserver
- fi
+# is this pld?
+if [ -x /sbin/insserv ]; then
+	/sbin/insserv /etc/rc.d/init.d/CDWserver
+fi
 
 # make "setgid root copies" of cdrdao, cdrecord, mkisofs and readcd
 for tool in cdrdao cdrecord mkisofs readcd
@@ -160,11 +151,11 @@ do
 
 #move projects files to new localization (FHS)
 
- if [ -e /home/CDWserver/ ]; then
- 	echo "Przenoszê pliki Projektów do %{_var}/CDWserver/projects/..."
- 	mv /home/CDWserver/* %{_var}/CDWserver/projects/ 2> /dev/null || :
- 	rmdir /home/CDWserver/
- fi
+if [ -e /home/CDWserver/ ]; then
+	echo "Przenoszê pliki Projektów do %{_var}/CDWserver/projects/..."
+	mv /home/CDWserver/* %{_var}/CDWserver/projects/ 2> /dev/null || :
+	rmdir /home/CDWserver/
+fi
 
 %preun
 if [ "$1" = "0" ]; then
