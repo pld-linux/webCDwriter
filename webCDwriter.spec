@@ -5,13 +5,13 @@
 Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
-Version:	2.6.92
+Version:	2.7.1
 Release:	0.1
 License:	GPL v2+
 Group:		Networking/Daemons
-Source0:	http://joerghaeger.de/webCDwriter/download/%{version}/%{name}-%{version}.tar.bz2
+Source0:	http://joerghaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
+# Source0-md5:	17e545d2eb351ff745896e4cdff077d5
 #Patch:
-# Source0-md5:
 # Source0Download: http://joerghaeger.de/webCDwriter/TARs.html
 URL:		http://JoergHaeger.de/webCDwriter/
 
@@ -21,8 +21,7 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	binutils
 BuildRequires:	libstdc++-devel
-BuildRequires:	username-comment-in-english
-BuildRequires:	weird-mambo-jumbo-in-post-scriptlet
+#BuildRequires:	weird-mambo-jumbo-in-post-scriptlet
 
 Requires(pre):	/bin/chown
 Requires(pre):	/bin/id
@@ -84,13 +83,12 @@ Zdalny klient dla webCDwriter
 %{__make}
 
 #TO DO:
-# kompilacja klienta w javie
+# compilation client in java BR - working javac (now use precompiled webCDcreator.jar)
 
 %install
 rm -rf $RPM_BUILD_ROOT
 %{__make} install
 
-#umieszczenie pliku rc startuj±cego serwer we w³a¶ciwym katalogu
 mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
 mv $RPM_BUILD_ROOT/etc/init.d/CDWserver $RPM_BUILD_ROOT/etc/rc.d/init.d/CDWserver
 
@@ -102,8 +100,7 @@ fi
 %pre
 # Add the "webCDwriter" user and group
 %groupadd -g 27 %{CDWgroup}
-# FIXME ENGLISHE!!!!!!
-%useradd -c "systemowy u¿ytkownik dla %{name}" -u 109 -r -d /home/services/CDWserver -s /bin/false -g %{CDWgroup} %{CDWuser}
+%useradd -c "system user for %{name}" -u 109 -r -d /home/services/CDWserver -s /bin/false -g %{CDWgroup} %{CDWuser}
 
 %post
 # TODO use trigger if it's from pld older package or discard
@@ -152,7 +149,7 @@ do
 #move projects files to new localization (FHS)
 
 if [ -e /home/CDWserver/ ]; then
-	echo "Przenoszê pliki Projektów do %{_var}/CDWserver/projects/..."
+	echo "move project files to %{_var}/CDWserver/projects/..."
 	mv /home/CDWserver/* %{_var}/CDWserver/projects/ 2> /dev/null || :
 	rmdir /home/CDWserver/
 fi
@@ -220,9 +217,10 @@ fi
 %{_bindir}/MD5Verify.jar
 %{_bindir}/tar2rpm.sh
 
-%{_sbindir}/CDWpasswd
+%attr(755,root,root) %{_sbindir}/CDWconfig.sh
+%attr(755,root,root) %{_sbindir}/CDWpasswd
 %attr(755,root,root) %{_sbindir}/CDWserver
-%{_sbindir}/CDWuseradd
+%attr(755,root,root) %{_sbindir}/CDWuseradd
 
 %dir %{_var}/CDWserver/bin/
 %dir %{_var}/CDWserver/export/
