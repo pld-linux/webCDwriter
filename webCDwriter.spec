@@ -21,7 +21,8 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	binutils
 BuildRequires:	libstdc++-devel
-#BuildRequires:	weird-mambo-jumbo-in-post-scriptlet
+BuildRequires:	weird-mambo-jumbo-in-post-scriptlet
+BuildRequires:	FHS-fixes
 
 Requires(pre):	/bin/chown
 Requires(pre):	/bin/id
@@ -70,10 +71,10 @@ Summary(pl):	Narzêdzie do sieciowego nagrywania CD - zdalny klient
 Group:		Networking/Utilities
 
 %description rcdrecord
-Remote client for webCDwriter
+Remote client for webCDwriter.
 
 %description rcdrecord -l pl
-Zdalny klient dla webCDwriter
+Zdalny klient dla webCDwritera.
 
 %prep
 %setup -q
@@ -82,14 +83,14 @@ Zdalny klient dla webCDwriter
 ./configure --pam
 %{__make}
 
-#TO DO:
-# compilation client in java BR - working javac (now use precompiled webCDcreator.jar)
+#TODO:
+# compile client in Java; BR - working javac (now use precompiled webCDcreator.jar)
 
 %install
 rm -rf $RPM_BUILD_ROOT
 %{__make} install
 
-mkdir -p $RPM_BUILD_ROOT/etc/rc.d/init.d
+install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 mv $RPM_BUILD_ROOT/etc/init.d/CDWserver $RPM_BUILD_ROOT/etc/rc.d/init.d/CDWserver
 
 %clean
@@ -98,12 +99,11 @@ if [ ! -e $RPM_BUILD_ROOT/dev/ ]; then
 fi
 
 %pre
-# Add the "webCDwriter" user and group
 %groupadd -g 27 %{CDWgroup}
-%useradd -c "system user for %{name}" -u 109 -r -d /home/services/CDWserver -s /bin/false -g %{CDWgroup} %{CDWuser}
+%useradd -c "%{name} user" -u 109 -r -d /home/services/CDWserver -s /bin/false -g %{CDWgroup} %{CDWuser}
 
 %post
-# TODO use trigger if it's from pld older package or discard
+# TODO use trigger if it's from older PLD package or discard
 # Since rpm will not change the owner of an existing %config file
 %{__chown} %{USER} /etc/CDWserver/accounts 2> /dev/null || :
 %{__chown} %{USER} /etc/CDWserver/config 2> /dev/null || :
@@ -130,6 +130,7 @@ if [ -x /sbin/insserv ]; then
 	/sbin/insserv /etc/rc.d/init.d/CDWserver
 fi
 
+# XX: FHS and packaging policy violations
 # make "setgid root copies" of cdrdao, cdrecord, mkisofs and readcd
 for tool in cdrdao cdrecord mkisofs readcd
 do
@@ -141,7 +142,7 @@ do
  		fi
  	fi
  	if [ -e %{_var}/CDWserver/bin/$tool ]; then
- 		%{__chown} root.%{CDWgroup} %{_var}/CDWserver/bin/$tool || :
+ 		%{__chown} root:%{CDWgroup} %{_var}/CDWserver/bin/$tool || :
  		%{__chmod} 4750 %{_var}/CDWserver/bin/$tool || :
  	fi
  done
@@ -190,19 +191,20 @@ fi
 %dir %attr(0755,%{CDWuser},%{CDWgroup}) /etc/CDWserver
 /etc/pam.d/cdwserver
 /etc/CDWserver/mime.types
-%attr(0600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/accounts
+%attr(600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/accounts
 %config(noreplace) %attr(650, %{CDWuser}, %{CDWgroup}) %verify(not md5 mtime size) /etc/CDWserver/config
-%attr(650, root, %{CDWgroup})  %verify(not md5 mtime size) /etc/CDWserver/config.default
+%attr(650,root,%{CDWgroup}) %verify(not md5 mtime size) /etc/CDWserver/config.default
 %config(noreplace) %attr(650, root, %{CDWgroup}) %verify(not md5 mtime size)/etc/CDWserver/config-root
 %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/greeting
 %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/waitForCD
-%attr(0600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/password
+%attr(600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/password
 %exclude %{_bindir}/files2cd
 %exclude %{_bindir}/image2cd
 %exclude %{_bindir}/rcdrecord
 
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) %{_var}/log/CDWserver
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) %{_var}/spool/CDWserver
+# XXX: FHS violation
 %dir %{_var}/CDWserver
 
 %attr(4754, root, %{CDWgroup}) %{_bindir}/cdrecord-dummy
@@ -222,14 +224,14 @@ fi
 %attr(755,root,root) %{_sbindir}/CDWserver
 %attr(755,root,root) %{_sbindir}/CDWuseradd
 
-%dir %{_var}/CDWserver/bin/
-%dir %{_var}/CDWserver/export/
+%dir %{_var}/CDWserver/bin
+%dir %{_var}/CDWserver/export
 %{_var}/CDWserver/export/*
 
-%dir %{_var}/CDWserver/http/
+%dir %{_var}/CDWserver/http
 %config(noreplace) %{_var}/CDWserver/http/about.html
 %config(noreplace) %{_var}/CDWserver/http/config.html
-%dir %{_var}/CDWserver/http/config/
+%dir %{_var}/CDWserver/http/config
 %{_var}/CDWserver/http/config/*
 %{_var}/CDWserver/http/default.css
 %{_var}/CDWserver/http/exampleProject.txt
@@ -239,31 +241,31 @@ fi
 %config(noreplace) %{_var}/CDWserver/http/help*.html
 %config(noreplace) %{_var}/CDWserver/http/index*.html
 %config(noreplace) %{_var}/CDWserver/http/messages*
-%dir %{_var}/CDWserver/http/rcdrecord/
+%dir %{_var}/CDWserver/http/rcdrecord
 %{_var}/CDWserver/http/rcdrecord/*
 %config(noreplace) %{_var}/CDWserver/http/status*.html
 %config(noreplace) %{_var}/CDWserver/http/support*.html
 %{_var}/CDWserver/http/*.png
-%dir %{_var}/CDWserver/http/webCDcreator/
+%dir %{_var}/CDWserver/http/webCDcreator
 %config(noreplace) %{_var}/CDWserver/http/webCDcreator/*.html
 %config(noreplace) %{_var}/CDWserver/http/webCDcreator/*.jnlp
-%dir %{_var}/CDWserver/http/webCDcreator/4netscape/
+%dir %{_var}/CDWserver/http/webCDcreator/4netscape
 %{_var}/CDWserver/http/webCDcreator/4netscape/*
-%dir %{_var}/CDWserver/http/webCDcreator/4plugin/
+%dir %{_var}/CDWserver/http/webCDcreator/4plugin
 %{_var}/CDWserver/http/webCDcreator/4plugin/*
-%dir %{_var}/CDWserver/http/webCDcreator/4pluginRSA/
+%dir %{_var}/CDWserver/http/webCDcreator/4pluginRSA
 %{_var}/CDWserver/http/webCDcreator/4pluginRSA/*
-%dir %{_var}/CDWserver/http/webCDcreator/doc/
+%dir %{_var}/CDWserver/http/webCDcreator/doc
 %{_var}/CDWserver/http/webCDcreator/doc/*
-%dir %{_var}/CDWserver/http/webCDcreator/help/
+%dir %{_var}/CDWserver/http/webCDcreator/help
 %{_var}/CDWserver/http/webCDcreator/help/*
-%dir %{_var}/CDWserver/http/webCDcreator/i18n/
+%dir %{_var}/CDWserver/http/webCDcreator/i18n
 %{_var}/CDWserver/http/webCDcreator/i18n/*
-%dir %{_var}/CDWserver/http/webCDcreator/icons/
+%dir %{_var}/CDWserver/http/webCDcreator/icons
 %{_var}/CDWserver/http/webCDcreator/icons/*
-%dir %{_var}/CDWserver/http/webCDcreator/errors/
+%dir %{_var}/CDWserver/http/webCDcreator/errors
 %{_var}/CDWserver/http/webCDcreator/errors/*.html
-%dir %attr(700, %{CDWuser}, %{CDWgroup}) %{_var}/CDWserver/projects/
+%dir %attr(700, %{CDWuser}, %{CDWgroup}) %{_var}/CDWserver/projects
 
 %files rcdrecord
 %defattr(644,root,root,755)
