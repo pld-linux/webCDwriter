@@ -137,24 +137,6 @@ if [ -x /sbin/chkconfig ]; then
 	/sbin/chkconfig --add CDWserver
 fi
 
-# XX: packaging policy violations
-#make "setgid root copies" of cdrdao, cdrecord, mkisofs and readcd
-
-for tool in cdrdao cdrecord mkisofs readcd
-do
- 	if [ ! -e %{_bindir}/CDWserver/bin/$tool ]; then
- 		if [ -e %{_bindir}/$tool ]; then
- 			cp -af %{_bindir}/$tool %{_bindir}/CDWserver/bin/ || :
- 		else
- 			cp -af /usr/local/bin/$tool %{_bindir}/CDWserver/bin/ 2> /dev/null || :
- 		fi
- 	fi
- 	if [ -e %{_bindir}/CDWserver/bin/$tool ]; then
- 		%{__chown} root:%{CDWgroup} %{_bindir}/CDWserver/bin/$tool || :
- 		%{__chmod} 4750 %{_bindir}/CDWserver/bin/$tool || :
- 	fi
-done
-
 #move old projects files to new localization (FHS)
 if [ -e /home/CDWserver/ ]; then
 	echo "move project files to %{_libdir}/CDWserver/projects/..."
@@ -223,7 +205,6 @@ fi
 %attr(755,root,root) %{_sbindir}/CDWserver
 %attr(755,root,root) %{_sbindir}/CDWuseradd
 
-%dir %{_bindir}/CDWserver/bin
 %dir %{_var}/lib/CDWserver/export
 %{_var}/lib/CDWserver/export/*
 
