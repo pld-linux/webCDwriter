@@ -16,7 +16,7 @@ diff -uNr webCDwriter-2.7.2/configure webCDwriter-2.7.2/configure
  SBINDIR=/usr/sbin
  SPOOLDIR=/var/spool/CDWserver
 -TOOLSDIR=/var/CDWserver/bin
-+TOOLSDIR=/usr/bin/CDWserver/bin
++TOOLSDIR=/usr/bin
  
  # the default user and group that run CDWserver
  GROUP=cdwserve
