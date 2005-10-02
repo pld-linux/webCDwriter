@@ -7,7 +7,7 @@ diff -uNr webCDwriter-2.7.2/configure webCDwriter-2.7.2/configure
  CONFIGDIR=/etc/CDWserver
 -EXPORTDIR=/var/CDWserver/export
 -HTTPDIR=/var/CDWserver/http
-+EXPORTDIR=/usr/share/CDWserver/export
++EXPORTDIR=/var/lib/CDWserver/export
 +HTTPDIR=/usr/share/CDWserver/http
  INITDIR=/etc/init.d
  LOGDIR=/var/log/CDWserver
