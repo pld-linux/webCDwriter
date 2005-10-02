@@ -117,7 +117,7 @@ fi
 %pre
 
 %groupadd -g 27 %{CDWgroup}
-%useradd -c "%{name} user" -u 109 -r -d %{_datadir}/CDWserver \
+%useradd -c "%{name} user" -u 109 -r -d %{_var}/lib/CDWserver \
 	-s /bin/false -g %{CDWgroup} %{CDWuser}
 
 %post
