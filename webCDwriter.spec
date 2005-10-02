@@ -1,7 +1,6 @@
 #TODO:
 # add certificate and compiling java client
-# FHS
-## XXX: FHS violation
+# XXX: FHS violation
 #	/var/CDWserver/{http,bin,exports} --> /usr/share/CDWserver/{http,bin,exports}
 #	/var/CDWserver/export/Server/doc --> /usr/share/doc/CDWserver
 #	/var/CDWserver --> /var/lib/CDWserver
@@ -13,13 +12,13 @@ Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
 Version:	2.7.2
-Release:	0.1
+Release:	0.2
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://joerghaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
 # Source0-md5:	88e97d83b172c646603323426d429065
 #Source0:	http://haeger.homeip.net/download/%{version}/%{name}-%{version}.tar.bz2
-#Patch:
+Patch0:		%{name}-FHS.patch
 # Source0Download: http://joerghaeger.de/webCDwriter/TARs.html
 URL:		http://JoergHaeger.de/webCDwriter/
 
@@ -29,8 +28,6 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	binutils
 BuildRequires:	libstdc++-devel
-#BuildRequires:	weird-mambo-jumbo-in-post-scriptlet
-#BuildRequires:	FHS-fixes
 BuildRequires:	jdkgcj
 
 Requires(pre):	/bin/chown
@@ -87,8 +84,10 @@ Zdalny klient dla webCDwritera.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
+
 ./configure	--pam \
 		--group=%{CDWgroup} \
 		--user=%{CDWuser} \
@@ -98,8 +97,7 @@ Zdalny klient dla webCDwritera.
 
 #		--nosCert= # Netscape Object Signing Certificate
 #		--sunCert= # certificate for the keytool from Sun
-#		--debug 
-#		--doNotCompileCDWserver
+#		--debug
 
 %{__make}
 
@@ -109,7 +107,8 @@ rm -rf $RPM_BUILD_ROOT
 
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_datadir}/CDWserver}
 mv $RPM_BUILD_ROOT/etc/init.d/CDWserver $RPM_BUILD_ROOT/etc/rc.d/init.d/CDWserver
-rm -rf  %{_var}/CDWserver/export/Server/doc 
+rm $RPM_BUILD_ROOT/%{_bindir}/CDWuninstall.sh
+
 %clean
 if [ ! -e $RPM_BUILD_ROOT/dev/ ]; then
 	rm -rf $RPM_BUILD_ROOT
@@ -140,29 +139,28 @@ if [ -x /sbin/chkconfig ]; then
 	/sbin/chkconfig --add CDWserver
 fi
 
-# XX: FHS and packaging policy violations
+# XX: packaging policy violations
 #make "setgid root copies" of cdrdao, cdrecord, mkisofs and readcd
 
 #for tool in cdrdao cdrecord mkisofs readcd
 #do
-# 	if [ ! -e %{_var}/CDWserver/bin/$tool ]; then
+# 	if [ ! -e %{_bindir}/CDWserver/bin/$tool ]; then
 # 		if [ -e %{_bindir}/$tool ]; then
-# 			cp -af %{_bindir}/$tool %{_var}/CDWserver/bin/ || :
+# 			cp -af %{_bindir}/$tool %{_bindir}/CDWserver/bin/ || :
 # 		else
-# 			cp -af /usr/local/bin/$tool %{_var}/CDWserver/bin/ 2> /dev/null || :
+# 			cp -af /usr/local/bin/$tool %{_bindir}/CDWserver/bin/ 2> /dev/null || :
 # 		fi
 # 	fi
-# 	if [ -e %{_var}/CDWserver/bin/$tool ]; then
-# 		%{__chown} root:%{CDWgroup} %{_var}/CDWserver/bin/$tool || :
-# 		%{__chmod} 4750 %{_var}/CDWserver/bin/$tool || :
+# 	if [ -e %{_bindir}/CDWserver/bin/$tool ]; then
+# 		%{__chown} root:%{CDWgroup} %{_bindir}/CDWserver/bin/$tool || :
+# 		%{__chmod} 4750 %{_bindir}/CDWserver/bin/$tool || :
 # 	fi
 # done
 
 #move old projects files to new localization (FHS)
-
 if [ -e /home/CDWserver/ ]; then
-	echo "move project files to %{_var}/CDWserver/projects/..."
-	cp /home/CDWserver/* %{_var}/CDWserver/projects/ 2> /dev/null || :
+	echo "move project files to %{_libdir}/CDWserver/projects/..."
+	cp /home/CDWserver/* %{_libdir}/CDWserver/projects/ 2> /dev/null || :
 	echo "use #rmdir /home/CDWserver/ to clear directory"
 fi
 
@@ -209,7 +207,6 @@ fi
 
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) %{_var}/log/CDWserver
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) %{_var}/spool/CDWserver
-%dir %{_var}/CDWserver
 %dir %{_datadir}/CDWserver 
 %attr(4754, root, %{CDWgroup}) %{_bindir}/cdrecord-dummy
 %attr(4754, root, %{CDWgroup}) %{_bindir}/cdrdao-dummy
@@ -228,48 +225,48 @@ fi
 %attr(755,root,root) %{_sbindir}/CDWserver
 %attr(755,root,root) %{_sbindir}/CDWuseradd
 
-%dir %{_var}/CDWserver/bin
-%dir %{_var}/CDWserver/export
-%{_var}/CDWserver/export/*
+%dir %{_bindir}/CDWserver/bin
+%dir %{_datadir}/CDWserver/export
+%{_datadir}/CDWserver/export/*
 
-%dir %{_var}/CDWserver/http
-%config(noreplace) %{_var}/CDWserver/http/about.html
-%config(noreplace) %{_var}/CDWserver/http/config.html
-%dir %{_var}/CDWserver/http/config
-%{_var}/CDWserver/http/config/*
-%{_var}/CDWserver/http/default.css
-%{_var}/CDWserver/http/exampleProject.txt
-%config(noreplace) %{_var}/CDWserver/http/favicon.ico
-%config(noreplace) %{_var}/CDWserver/http/footer
-%config(noreplace) %{_var}/CDWserver/http/head*
-%config(noreplace) %{_var}/CDWserver/http/help*.html
-%config(noreplace) %{_var}/CDWserver/http/index*.html
-%config(noreplace) %{_var}/CDWserver/http/messages*
-%dir %{_var}/CDWserver/http/rcdrecord
-%{_var}/CDWserver/http/rcdrecord/*
-%config(noreplace) %{_var}/CDWserver/http/status*.html
-%config(noreplace) %{_var}/CDWserver/http/support*.html
-%{_var}/CDWserver/http/*.png
-%dir %{_var}/CDWserver/http/webCDcreator
-%config(noreplace) %{_var}/CDWserver/http/webCDcreator/*.html
-%config(noreplace) %{_var}/CDWserver/http/webCDcreator/*.jnlp
-%dir %{_var}/CDWserver/http/webCDcreator/4netscape
-%{_var}/CDWserver/http/webCDcreator/4netscape/*
-%dir %{_var}/CDWserver/http/webCDcreator/4plugin
-%{_var}/CDWserver/http/webCDcreator/4plugin/*
-%dir %{_var}/CDWserver/http/webCDcreator/4pluginRSA
-%{_var}/CDWserver/http/webCDcreator/4pluginRSA/*
-%dir %{_var}/CDWserver/http/webCDcreator/doc
-%{_var}/CDWserver/http/webCDcreator/doc/*
-%dir %{_var}/CDWserver/http/webCDcreator/help
-%{_var}/CDWserver/http/webCDcreator/help/*
-%dir %{_var}/CDWserver/http/webCDcreator/i18n
-%{_var}/CDWserver/http/webCDcreator/i18n/*
-%dir %{_var}/CDWserver/http/webCDcreator/icons
-%{_var}/CDWserver/http/webCDcreator/icons/*
-%dir %{_var}/CDWserver/http/webCDcreator/errors
-%{_var}/CDWserver/http/webCDcreator/errors/*.html
-%dir %attr(700, %{CDWuser}, %{CDWgroup}) %{_var}/CDWserver/projects
+%dir %{_datadir}/CDWserver/http
+%config(noreplace) %{_datadir}/CDWserver/http/about.html
+%config(noreplace) %{_datadir}/CDWserver/http/config.html
+%dir %{_datadir}/CDWserver/http/config
+%{_datadir}/CDWserver/http/config/*
+%{_datadir}/CDWserver/http/default.css
+%{_datadir}/CDWserver/http/exampleProject.txt
+%config(noreplace) %{_datadir}/CDWserver/http/favicon.ico
+%config(noreplace) %{_datadir}/CDWserver/http/footer
+%config(noreplace) %{_datadir}/CDWserver/http/head*
+%config(noreplace) %{_datadir}/CDWserver/http/help*.html
+%config(noreplace) %{_datadir}/CDWserver/http/index*.html
+%config(noreplace) %{_datadir}/CDWserver/http/messages*
+%dir %{_datadir}/CDWserver/http/rcdrecord
+%{_datadir}/CDWserver/http/rcdrecord/*
+%config(noreplace) %{_datadir}/CDWserver/http/status*.html
+%config(noreplace) %{_datadir}/CDWserver/http/support*.html
+%{_datadir}/CDWserver/http/*.png
+%dir %{_datadir}/CDWserver/http/webCDcreator
+%config(noreplace) %{_datadir}/CDWserver/http/webCDcreator/*.html
+%config(noreplace) %{_datadir}/CDWserver/http/webCDcreator/*.jnlp
+%dir %{_datadir}/CDWserver/http/webCDcreator/4netscape
+%{_datadir}/CDWserver/http/webCDcreator/4netscape/*
+%dir %{_datadir}/CDWserver/http/webCDcreator/4plugin
+%{_datadir}/CDWserver/http/webCDcreator/4plugin/*
+%dir %{_datadir}/CDWserver/http/webCDcreator/4pluginRSA
+%{_datadir}/CDWserver/http/webCDcreator/4pluginRSA/*
+%dir %{_datadir}/CDWserver/http/webCDcreator/doc
+%{_datadir}/CDWserver/http/webCDcreator/doc/*
+%dir %{_datadir}/CDWserver/http/webCDcreator/help
+%{_datadir}/CDWserver/http/webCDcreator/help/*
+%dir %{_datadir}/CDWserver/http/webCDcreator/i18n
+%{_datadir}/CDWserver/http/webCDcreator/i18n/*
+%dir %{_datadir}/CDWserver/http/webCDcreator/icons
+%{_datadir}/CDWserver/http/webCDcreator/icons/*
+%dir %{_datadir}/CDWserver/http/webCDcreator/errors
+%{_datadir}/CDWserver/http/webCDcreator/errors/*.html
+%dir %attr(700, %{CDWuser}, %{CDWgroup}) %{_var}/lib/CDWserver/projects
 
 %files rcdrecord
 %defattr(644,root,root,755)
