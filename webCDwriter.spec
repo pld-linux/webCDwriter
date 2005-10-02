@@ -1,9 +1,5 @@
 #TODO:
 # add certificate and compiling java client
-# XXX: FHS violation
-#	/var/CDWserver/{http,bin,exports} --> /usr/share/CDWserver/{http,bin,exports}
-#	/var/CDWserver/export/Server/doc --> /usr/share/doc/CDWserver
-#	/var/CDWserver --> /var/lib/CDWserver
 
 %define	CDWuser		webcdwriter
 %define	CDWgroup	cdwrite
