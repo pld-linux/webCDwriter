@@ -1,3 +1,10 @@
+#TODO:
+# add certificate and compiling java client
+# FHS
+## XXX: FHS violation
+#	/var/CDWserver/{http,bin,exports} --> /usr/share/CDWserver/{http,bin,exports}
+#	/var/CDWserver/export/Server/doc --> /usr/share/doc/CDWserver
+#	/var/CDWserver --> /var/lib/CDWserver
 
 %define	CDWuser		webcdwriter
 %define	CDWgroup	cdwrite
@@ -5,12 +12,13 @@
 Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
-Version:	2.7.1
+Version:	2.7.2
 Release:	0.1
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://joerghaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
-# Source0-md5:	17e545d2eb351ff745896e4cdff077d5
+# Source0-md5:	88e97d83b172c646603323426d429065
+#Source0:	http://haeger.homeip.net/download/%{version}/%{name}-%{version}.tar.bz2
 #Patch:
 # Source0Download: http://joerghaeger.de/webCDwriter/TARs.html
 URL:		http://JoergHaeger.de/webCDwriter/
@@ -21,8 +29,9 @@ BuildRequires:	autoconf
 BuildRequires:	automake
 BuildRequires:	binutils
 BuildRequires:	libstdc++-devel
-BuildRequires:	weird-mambo-jumbo-in-post-scriptlet
-BuildRequires:	FHS-fixes
+#BuildRequires:	weird-mambo-jumbo-in-post-scriptlet
+#BuildRequires:	FHS-fixes
+BuildRequires:	jdkgcj
 
 Requires(pre):	/bin/chown
 Requires(pre):	/bin/id
@@ -80,31 +89,42 @@ Zdalny klient dla webCDwritera.
 %setup -q
 
 %build
-./configure --pam
-%{__make}
+./configure	--pam \
+		--group=%{CDWgroup} \
+		--user=%{CDWuser} \
+		--port=12411 \
+		--destDir=$RPM_BUILD_ROOT \
+		--doNotCompileWebCDcreator
 
-#TODO:
-# compile client in Java; BR - working javac (now use precompiled webCDcreator.jar)
+#		--nosCert= # Netscape Object Signing Certificate
+#		--sunCert= # certificate for the keytool from Sun
+#		--debug 
+#		--doNotCompileCDWserver
+
+%{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__make} install
+%{__make} install 
 
-install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_datadir}/CDWserver}
 mv $RPM_BUILD_ROOT/etc/init.d/CDWserver $RPM_BUILD_ROOT/etc/rc.d/init.d/CDWserver
-
+rm -rf  %{_var}/CDWserver/export/Server/doc 
 %clean
 if [ ! -e $RPM_BUILD_ROOT/dev/ ]; then
 	rm -rf $RPM_BUILD_ROOT
 fi
 
 %pre
+
 %groupadd -g 27 %{CDWgroup}
-%useradd -c "%{name} user" -u 109 -r -d /home/services/CDWserver -s /bin/false -g %{CDWgroup} %{CDWuser}
+%useradd -c "%{name} user" -u 109 -r -d %{_datadir}/CDWserver \
+	-s /bin/false -g %{CDWgroup} %{CDWuser}
 
 %post
 # TODO use trigger if it's from older PLD package or discard
 # Since rpm will not change the owner of an existing %config file
+
 %{__chown} %{USER} /etc/CDWserver/accounts 2> /dev/null || :
 %{__chown} %{USER} /etc/CDWserver/config 2> /dev/null || :
 %{__chown} %{USER} /etc/CDWserver/key.txt 2> /dev/null || :
@@ -115,44 +135,35 @@ fi
 %{__chown} %{USER} %{_var}/log/CDWserver/log 2> /dev/null || :
 %{__chown} %{USER} %{_var}/log/CDWserver/sessions 2> /dev/null || :
 
-# ????
-if [ -e %{_bindir}/CDWserver-GPL ]; then
-	rm -f %{_bindir}/CDWserver-GPL
-fi
-
 # use R: not test for -x
 if [ -x /sbin/chkconfig ]; then
 	/sbin/chkconfig --add CDWserver
 fi
 
-# is this pld?
-if [ -x /sbin/insserv ]; then
-	/sbin/insserv /etc/rc.d/init.d/CDWserver
-fi
-
 # XX: FHS and packaging policy violations
-# make "setgid root copies" of cdrdao, cdrecord, mkisofs and readcd
-for tool in cdrdao cdrecord mkisofs readcd
-do
- 	if [ ! -e %{_var}/CDWserver/bin/$tool ]; then
- 		if [ -e %{_bindir}/$tool ]; then
- 			cp -af %{_bindir}/$tool %{_var}/CDWserver/bin/ || :
- 		else
- 			cp -af /usr/local/bin/$tool %{_var}/CDWserver/bin/ 2> /dev/null || :
- 		fi
- 	fi
- 	if [ -e %{_var}/CDWserver/bin/$tool ]; then
- 		%{__chown} root:%{CDWgroup} %{_var}/CDWserver/bin/$tool || :
- 		%{__chmod} 4750 %{_var}/CDWserver/bin/$tool || :
- 	fi
- done
+#make "setgid root copies" of cdrdao, cdrecord, mkisofs and readcd
 
-#move projects files to new localization (FHS)
+#for tool in cdrdao cdrecord mkisofs readcd
+#do
+# 	if [ ! -e %{_var}/CDWserver/bin/$tool ]; then
+# 		if [ -e %{_bindir}/$tool ]; then
+# 			cp -af %{_bindir}/$tool %{_var}/CDWserver/bin/ || :
+# 		else
+# 			cp -af /usr/local/bin/$tool %{_var}/CDWserver/bin/ 2> /dev/null || :
+# 		fi
+# 	fi
+# 	if [ -e %{_var}/CDWserver/bin/$tool ]; then
+# 		%{__chown} root:%{CDWgroup} %{_var}/CDWserver/bin/$tool || :
+# 		%{__chmod} 4750 %{_var}/CDWserver/bin/$tool || :
+# 	fi
+# done
+
+#move old projects files to new localization (FHS)
 
 if [ -e /home/CDWserver/ ]; then
 	echo "move project files to %{_var}/CDWserver/projects/..."
-	mv /home/CDWserver/* %{_var}/CDWserver/projects/ 2> /dev/null || :
-	rmdir /home/CDWserver/
+	cp /home/CDWserver/* %{_var}/CDWserver/projects/ 2> /dev/null || :
+	echo "use #rmdir /home/CDWserver/ to clear directory"
 fi
 
 %preun
@@ -169,12 +180,6 @@ if [ "$1" = "0" ]; then
 fi
 
 %postun
-if [ $1 = 0 ]; then
-	if [ -x /sbin/insserv ]; then
-		/sbin/insserv /etc/rc.d/init.d
-	fi
-fi
-
 if [ $1 -ge 1 ]; then
 	/etc/rc.d/init.d/CDWserver condrestart
 fi
@@ -204,15 +209,14 @@ fi
 
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) %{_var}/log/CDWserver
 %dir %attr(0700,%{CDWuser},%{CDWgroup}) %{_var}/spool/CDWserver
-# XXX: FHS violation
 %dir %{_var}/CDWserver
-
+%dir %{_datadir}/CDWserver 
 %attr(4754, root, %{CDWgroup}) %{_bindir}/cdrecord-dummy
 %attr(4754, root, %{CDWgroup}) %{_bindir}/cdrdao-dummy
 %attr(4754, root, %{CDWgroup}) %{_bindir}/CDWrootGate
 %attr(4754, root, %{CDWgroup}) %{_bindir}/CDWverify
 %attr(4754, root, %{CDWgroup}) %{_bindir}/CDWverify-dummy
-%attr(4754, root, %{CDWgroup}) %{_bindir}/setScheduler
+#%attr(4754, root, %{CDWgroup}) %{_bindir}/setScheduler
 
 %{_bindir}/dvd+rw-format-dummy
 %{_bindir}/growisofs-dummy
