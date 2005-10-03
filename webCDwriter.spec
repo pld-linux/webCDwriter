@@ -41,6 +41,7 @@ Requires:       cdrtools-readcd >= 2.01
 Requires:	cdrtools-mkisofs >= 2.01
 Requires:	cdrtools-utils >= 2.01
 Requires:	mpg123
+Requires:	sox
 
 Provides:	group(%{CDWgroup})
 Provides:	user(%{CDWuser})
