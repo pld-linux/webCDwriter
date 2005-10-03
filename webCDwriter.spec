@@ -1,5 +1,6 @@
-#TODO:
-# add certificate and compiling java client
+# TODO:
+# - add certificate and compiling java client
+# - make install attempts to useradd/groupadd and possibly succeeds if ran as root
 
 %define	CDWuser		webcdwriter
 %define	CDWgroup	cdwrite
@@ -36,17 +37,18 @@ Requires(pre):	/usr/sbin/usermod
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/userdel
 Requires(postun):	/usr/sbin/groupdel
-Requires:	cdrdao	
+Requires:	cdrdao
 Requires:	cdrtools >= 2.01
-Requires:       cdrtools-readcd >= 2.01
+Requires:	cdrtools-readcd >= 2.01
 Requires:	cdrtools-mkisofs >= 2.01
 Requires:	cdrtools-utils >= 2.01
 Requires:	mpg123
 Requires:	sox
-
 Provides:	group(%{CDWgroup})
 Provides:	user(%{CDWuser})
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		_sysconfdir		/etc/CDWserver
 
 %description
 webCDwriter can be used to make a single CD-writer available to the
@@ -60,14 +62,14 @@ line client that trys to offer the functionality of cdrecord over the
 network (not complete yet).
 
 %description -l pl
-webCdwriter s³u¿y do udostêpniania pojedynczej nagrywarki
-dla wszystkich u¿ytkowników sieci. Zawiera serwer CDWserver oraz
-klientów: webCDcreator i rcdrecord. CDWserver przechowuje pliki
-transmitowane przez klientów, zarz±dza nagrywark± u¿ywaj±c do tego
-celu cdrecord. webCDcreator jest apletem Javy uruchamianym z
-przegl±darki (Mozilla, Netscape, Internet Explorer,...), pomagaj±cym
-transmitowaæ pliki. rcdrecord jest uruchamianym w pow³oce klientem
-który spe³nia funkcje cdrecord w sieci (jeszcze nie skoñczony).
+webCdwriter s³u¿y do udostêpniania pojedynczej nagrywarki dla
+wszystkich u¿ytkowników sieci. Zawiera serwer CDWserver oraz klientów:
+webCDcreator i rcdrecord. CDWserver przechowuje pliki transmitowane
+przez klientów, zarz±dza nagrywark± u¿ywaj±c do tego celu cdrecord.
+webCDcreator jest apletem Javy uruchamianym z przegl±darki (Mozilla,
+Netscape, Internet Explorer,...), pomagaj±cym transmitowaæ pliki.
+rcdrecord jest uruchamianym w pow³oce klientem który spe³nia funkcje
+cdrecord w sieci (jeszcze nie skoñczony).
 
 %package rcdrecord
 Summary:	Network CD Writing tool - remote client
@@ -101,7 +103,8 @@ Zdalny klient dla webCDwritera.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%{__make} install 
+# looks like make install auto users $RPM_BUILD_ROOT?
+%{__make} install
 
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_datadir}/CDWserver}
 mv $RPM_BUILD_ROOT/etc/init.d/CDWserver $RPM_BUILD_ROOT/etc/rc.d/init.d/CDWserver
@@ -171,23 +174,23 @@ fi
 %defattr(644,root,root,755)
 %doc CREDITS ChangeLog README *.html
 %attr(754,root,root) /etc/rc.d/init.d/CDWserver
-%dir %attr(0755,%{CDWuser},%{CDWgroup}) /etc/CDWserver
+%dir %attr(755,%{CDWuser},%{CDWgroup}) %{_sysconfdir}
 /etc/pam.d/cdwserver
-/etc/CDWserver/mime.types
-%attr(600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/accounts
-%config(noreplace) %attr(640, %{CDWuser}, %{CDWgroup}) %verify(not md5 mtime size) /etc/CDWserver/config
-%attr(640,root,%{CDWgroup}) %verify(not md5 mtime size) /etc/CDWserver/config.default
-%config(noreplace) %attr(640, root, %{CDWgroup}) %verify(not md5 mtime size)/etc/CDWserver/config-root
-%config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/greeting
-%config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/waitForCD
-%attr(600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) /etc/CDWserver/password
+%{_sysconfdir}/mime.types
+%attr(600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/accounts
+%config(noreplace) %attr(640, %{CDWuser}, %{CDWgroup}) %verify(not md5 mtime size) %{_sysconfdir}/config
+%attr(640,root,%{CDWgroup}) %verify(not md5 mtime size) %{_sysconfdir}/config.default
+%config(noreplace) %attr(640, root, %{CDWgroup}) %verify(not md5 mtime size)%{_sysconfdir}/config-root
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/greeting
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/waitForCD
+%attr(600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/password
 %exclude %{_bindir}/files2cd
 %exclude %{_bindir}/image2cd
 %exclude %{_bindir}/rcdrecord
 
-%dir %attr(0700,%{CDWuser},%{CDWgroup}) %{_var}/log/CDWserver
-%dir %attr(0700,%{CDWuser},%{CDWgroup}) %{_var}/spool/CDWserver
-%dir %{_datadir}/CDWserver 
+%dir %attr(700,%{CDWuser},%{CDWgroup}) %{_var}/log/CDWserver
+%dir %attr(700,%{CDWuser},%{CDWgroup}) %{_var}/spool/CDWserver
+%dir %{_datadir}/CDWserver
 %attr(4754, root, %{CDWgroup}) %{_bindir}/cdrecord-dummy
 %attr(4754, root, %{CDWgroup}) %{_bindir}/cdrdao-dummy
 %attr(4754, root, %{CDWgroup}) %{_bindir}/CDWrootGate
@@ -195,10 +198,10 @@ fi
 %attr(4754, root, %{CDWgroup}) %{_bindir}/CDWverify-dummy
 #%attr(4754, root, %{CDWgroup}) %{_bindir}/setScheduler
 
-%{_bindir}/dvd+rw-format-dummy
-%{_bindir}/growisofs-dummy
-%{_bindir}/MD5Verify.jar
-%{_bindir}/tar2rpm.sh
+%attr(755,root,root) %{_bindir}/dvd+rw-format-dummy
+%attr(755,root,root) %{_bindir}/growisofs-dummy
+%attr(755,root,root) %{_bindir}/MD5Verify.jar
+%attr(755,root,root) %{_bindir}/tar2rpm.sh
 
 %attr(755,root,root) %{_sbindir}/CDWconfig.sh
 %attr(755,root,root) %{_sbindir}/CDWpasswd
