@@ -8,7 +8,7 @@ Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
 Version:	2.7.2
-Release:	0.5
+Release:	0.6
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://joerghaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
@@ -36,6 +36,7 @@ Requires(pre):	/usr/sbin/usermod
 Requires(post,preun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/userdel
 Requires(postun):	/usr/sbin/groupdel
+Requires:	cdrdao	
 Requires:	cdrtools >= 2.01
 Requires:       cdrtools-readcd >= 2.01
 Requires:	cdrtools-mkisofs >= 2.01
@@ -140,6 +141,8 @@ if [ -e /home/CDWserver/ ]; then
 	cp /home/CDWserver/* %{_libdir}/CDWserver/projects/ 2> /dev/null || :
 	echo "use #rmdir /home/CDWserver/ to clear directory"
 fi
+
+/usr/sbin/CDWconfig.sh %{CDWuser} %{CDWgroup}
 
 %preun
 if [ "$1" = "0" ]; then
