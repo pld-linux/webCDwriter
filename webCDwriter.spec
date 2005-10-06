@@ -9,7 +9,7 @@ Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
 Version:	2.7.2
-Release:	0.6
+Release:	0.7
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://joerghaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
@@ -123,15 +123,15 @@ fi
 # TODO use trigger if it's from older PLD package or discard
 # Since rpm will not change the owner of an existing %config file
 
-%{__chown} %{USER} /etc/CDWserver/accounts 2> /dev/null || :
-%{__chown} %{USER} /etc/CDWserver/config 2> /dev/null || :
-%{__chown} %{USER} /etc/CDWserver/key.txt 2> /dev/null || :
-%{__chown} %{USER} /etc/CDWserver/password 2> /dev/null || :
+%{__chown} %{CDWuser} /etc/CDWserver/accounts 2> /dev/null || :
+%{__chown} %{CDWuser} /etc/CDWserver/config 2> /dev/null || :
+%{__chown} %{CDWuser} /etc/CDWserver/key.txt 2> /dev/null || :
+%{__chown} %{CDWuser} /etc/CDWserver/password 2> /dev/null || :
 %{__chmod} 600 /etc/CDWserver/password 2> /dev/null || :
-%{__chown} %{USER} %{_var}/log/CDWserver/CDinfos 2> /dev/null || :
-%{__chown} %{USER} %{_var}/log/CDWserver/connects 2> /dev/null || :
-%{__chown} %{USER} %{_var}/log/CDWserver/log 2> /dev/null || :
-%{__chown} %{USER} %{_var}/log/CDWserver/sessions 2> /dev/null || :
+%{__chown} %{CDWuser} %{_var}/log/CDWserver/CDinfos 2> /dev/null || :
+%{__chown} %{CDWuser} %{_var}/log/CDWserver/connects 2> /dev/null || :
+%{__chown} %{CDWuser} %{_var}/log/CDWserver/log 2> /dev/null || :
+%{__chown} %{CDWuser} %{_var}/log/CDWserver/sessions 2> /dev/null || :
 
 # use R: not test for -x
 if [ -x /sbin/chkconfig ]; then
@@ -145,7 +145,20 @@ if [ -e /home/CDWserver/ ]; then
 	echo "use #rmdir /home/CDWserver/ to clear directory"
 fi
 
+
 /usr/sbin/CDWconfig.sh %{CDWuser} %{CDWgroup}
+
+#patch and/or e-mail to program author
+#if this not set WCDwriter display error
+#/usr/sbin/CDWconfig.sh root %{CDWgroup}
+#
+# if this not set WCDwriter display error
+# chown root.cdwrite /usr/bin/cdrdao
+# chmod 4750 /usr/bin/cdrdao
+# chown root.cdwrite /usr/bin/cdrecord
+# chmod 4750 /usr/bin/cdrecord
+# chown root.cdwrite /usr/bin/mkisofs
+# chmod 4750 /usr/bin/mkisofs
 
 %preun
 if [ "$1" = "0" ]; then
