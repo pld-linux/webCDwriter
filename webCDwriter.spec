@@ -9,7 +9,7 @@ Summary:	Network CD Writing tool
 Summary(pl):	Narzêdzie do sieciowego nagrywania CD
 Name:		webCDwriter
 Version:	2.7.2
-Release:	0.7
+Release:	0.8
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://joerghaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
@@ -39,9 +39,9 @@ Requires(postun):	/usr/sbin/userdel
 Requires(postun):	/usr/sbin/groupdel
 Requires:	cdrdao
 Requires:	cdrtools >= 2.01
-Requires:	cdrtools-readcd >= 2.01
-Requires:	cdrtools-mkisofs >= 2.01
-Requires:	cdrtools-utils >= 2.01
+Requires:	/usr/bin/readcd
+Requires:	/usr/bin/mkisofs
+Requires:	/usr/bin/isoinfo
 Requires:	mpg123
 Requires:	sox
 Provides:	group(%{CDWgroup})
