@@ -1,7 +1,7 @@
-diff -uNr webCDwriter-2.7.2/configure webCDwriter-2.7.2/configure
---- webCDwriter-2.7.2/configure	2005-08-29 11:53:20.000000000 +0200
-+++ webCDwriter-2.7.2/configure	2005-10-02 17:01:05.000000000 +0200
-@@ -15,14 +15,14 @@
+diff -urN webCDwriter-2.7.3.orig/configure webCDwriter-2.7.3/configure
+--- webCDwriter-2.7.3.orig/configure	2005-09-27 12:28:42.000000000 +0200
++++ webCDwriter-2.7.3/configure	2005-11-20 21:57:59.000000000 +0100
+@@ -15,15 +15,15 @@
  # name. See the startup script $INITDIR/CDWserver.
  BINDIR=/usr/bin
  CONFIGDIR=/etc/CDWserver
@@ -11,6 +11,7 @@ diff -uNr webCDwriter-2.7.2/configure webCDwriter-2.7.2/configure
 +HTTPDIR=/usr/share/CDWserver/http
  INITDIR=/etc/init.d
  LOGDIR=/var/log/CDWserver
+ MNTDIR=/var/CDWserver/mnt
 -PROJECTSDIR=/var/CDWserver/projects
 +PROJECTSDIR=/var/lib/CDWserver/projects
  SBINDIR=/usr/sbin
@@ -20,16 +21,16 @@ diff -uNr webCDwriter-2.7.2/configure webCDwriter-2.7.2/configure
  
  # the default user and group that run CDWserver
  GROUP=cdwserve
-
-diff -uNr webCDwriter-2.7.2/rcdrecord/configure webCDwriter-2.7.2/rcdrecord/configure
---- webCDwriter-2.7.2.orig/rcdrecord/configure	2005-08-29 11:56:59.000000000 +0200
-+++ webCDwriter-2.7.2/rcdrecord/configure	2005-10-02 17:53:54.000000000 +0200
-@@ -11,7 +11,7 @@
+diff -urN webCDwriter-2.7.3.orig/rcdrecord/configure webCDwriter-2.7.3/rcdrecord/configure
+--- webCDwriter-2.7.3.orig/rcdrecord/configure	2005-08-29 11:56:59.000000000 +0200
++++ webCDwriter-2.7.3/rcdrecord/configure	2005-11-20 21:59:19.000000000 +0100
+@@ -11,8 +11,7 @@
  
  # directories
  BINDIR=/usr/bin
 -HTTPDIR=/var/CDWserver/http
+-
 +HTTPDIR=/usr/share/CDWserver/http
- 
  # files
  CONFIGFILE=/etc/rcdrecord.conf
+ 
