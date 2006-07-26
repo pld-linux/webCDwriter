@@ -17,15 +17,15 @@ Source0:	http://joerghaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
 Patch0:		%{name}-FHS.patch
 # Source0Download: http://joerghaeger.de/webCDwriter/TARs.html
 URL:		http://JoergHaeger.de/webCDwriter/
-
-BuildRequires:	rpmbuild(macros) >= 1.202
-BuildRequires:	pam-devel
 BuildRequires:	autoconf
 BuildRequires:	automake
-BuildRequires:	binutils
-BuildRequires:	libstdc++-devel
 BuildRequires:	jdkgcj
-
+BuildRequires:	libstdc++-devel
+BuildRequires:	pam-devel
+BuildRequires:	rpmbuild(macros) >= 1.202
+Requires(post,preun):	/sbin/chkconfig
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/chown
 Requires(pre):	/bin/id
 Requires(pre):	/usr/bin/find
@@ -33,14 +33,11 @@ Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires(pre):	/usr/sbin/usermod
-Requires(post,preun):	/sbin/chkconfig
-Requires(postun):	/usr/sbin/userdel
-Requires(postun):	/usr/sbin/groupdel
+Requires:	/usr/bin/isoinfo
+Requires:	/usr/bin/mkisofs
+Requires:	/usr/bin/readcd
 Requires:	cdrdao
 Requires:	cdrtools >= 2.01
-Requires:	/usr/bin/readcd
-Requires:	/usr/bin/mkisofs
-Requires:	/usr/bin/isoinfo
 Requires:	mpg123
 Requires:	sox
 Provides:	group(%{CDWgroup})
@@ -107,7 +104,7 @@ rm -rf $RPM_BUILD_ROOT
 
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_datadir}/CDWserver}
 mv $RPM_BUILD_ROOT/etc/init.d/CDWserver $RPM_BUILD_ROOT/etc/rc.d/init.d/CDWserver
-rm $RPM_BUILD_ROOT/%{_bindir}/CDWuninstall.sh
+rm $RPM_BUILD_ROOT%{_bindir}/CDWuninstall.sh
 
 %clean
 if [ ! -e $RPM_BUILD_ROOT/dev/ ]; then
