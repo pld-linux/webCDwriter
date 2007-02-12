@@ -6,7 +6,7 @@
 %define	CDWgroup	cdwrite
 
 Summary:	Network CD Writing tool
-Summary(pl.UTF-8):   Narzędzie do sieciowego nagrywania CD
+Summary(pl.UTF-8):	Narzędzie do sieciowego nagrywania CD
 Name:		webCDwriter
 Version:	2.7.3
 Release:	1
@@ -69,7 +69,7 @@ cdrecord w sieci (jeszcze nie skończony).
 
 %package rcdrecord
 Summary:	Network CD Writing tool - remote client
-Summary(pl.UTF-8):   Narzędzie do sieciowego nagrywania CD - zdalny klient
+Summary(pl.UTF-8):	Narzędzie do sieciowego nagrywania CD - zdalny klient
 Group:		Networking/Utilities
 
 %description rcdrecord
