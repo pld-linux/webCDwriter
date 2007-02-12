@@ -6,7 +6,7 @@
 %define	CDWgroup	cdwrite
 
 Summary:	Network CD Writing tool
-Summary(pl):	Narzêdzie do sieciowego nagrywania CD
+Summary(pl.UTF-8):   NarzÄ™dzie do sieciowego nagrywania CD
 Name:		webCDwriter
 Version:	2.7.3
 Release:	1
@@ -57,25 +57,25 @@ together a CD and transmits the files. Finally rcdrecord is a command
 line client that trys to offer the functionality of cdrecord over the
 network (not complete yet).
 
-%description -l pl
-webCdwriter s³u¿y do udostêpniania pojedynczej nagrywarki dla
-wszystkich u¿ytkowników sieci. Zawiera serwer CDWserver oraz klientów:
+%description -l pl.UTF-8
+webCdwriter sÅ‚uÅ¼y do udostÄ™pniania pojedynczej nagrywarki dla
+wszystkich uÅ¼ytkownikÃ³w sieci. Zawiera serwer CDWserver oraz klientÃ³w:
 webCDcreator i rcdrecord. CDWserver przechowuje pliki transmitowane
-przez klientów, zarz±dza nagrywark± u¿ywaj±c do tego celu cdrecord.
-webCDcreator jest apletem Javy uruchamianym z przegl±darki (Mozilla,
-Netscape, Internet Explorer,...), pomagaj±cym transmitowaæ pliki.
-rcdrecord jest uruchamianym w pow³oce klientem który spe³nia funkcje
-cdrecord w sieci (jeszcze nie skoñczony).
+przez klientÃ³w, zarzÄ…dza nagrywarkÄ… uÅ¼ywajÄ…c do tego celu cdrecord.
+webCDcreator jest apletem Javy uruchamianym z przeglÄ…darki (Mozilla,
+Netscape, Internet Explorer,...), pomagajÄ…cym transmitowaÄ‡ pliki.
+rcdrecord jest uruchamianym w powÅ‚oce klientem ktÃ³ry speÅ‚nia funkcje
+cdrecord w sieci (jeszcze nie skoÅ„czony).
 
 %package rcdrecord
 Summary:	Network CD Writing tool - remote client
-Summary(pl):	Narzêdzie do sieciowego nagrywania CD - zdalny klient
+Summary(pl.UTF-8):   NarzÄ™dzie do sieciowego nagrywania CD - zdalny klient
 Group:		Networking/Utilities
 
 %description rcdrecord
 Remote client for webCDwriter.
 
-%description rcdrecord -l pl
+%description rcdrecord -l pl.UTF-8
 Zdalny klient dla webCDwritera.
 
 %prep
