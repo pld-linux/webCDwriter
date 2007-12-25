@@ -8,18 +8,17 @@
 Summary:	Network CD Writing tool
 Summary(pl.UTF-8):	Narzędzie do sieciowego nagrywania CD
 Name:		webCDwriter
-Version:	2.7.3
+Version:	2.8.1
 Release:	1
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://joerghaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
-# Source0-md5:	21360681b4c731978aac28967d0819de
+# Source0-md5:	7cf04f31507a1da96073eef2d50b65b0
 Patch0:		%{name}-FHS.patch
 # Source0Download: http://joerghaeger.de/webCDwriter/TARs.html
 URL:		http://JoergHaeger.de/webCDwriter/
 BuildRequires:	autoconf
 BuildRequires:	automake
-BuildRequires:	jdkgcj
 BuildRequires:	libstdc++-devel
 BuildRequires:	pam-devel
 BuildRequires:	rpmbuild(macros) >= 1.202
@@ -191,7 +190,10 @@ fi
 %attr(640,root,%{CDWgroup}) %verify(not md5 mtime size) %{_sysconfdir}/config.default
 %config(noreplace) %attr(640, root, %{CDWgroup}) %verify(not md5 mtime size)%{_sysconfdir}/config-root
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/greeting
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/waitForCD
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/insertCD.html
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/insertCD_de.html
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/insertCD_no.html
+#%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/waitForCD
 %attr(600,%{CDWuser},%{CDWgroup}) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/password
 %exclude %{_bindir}/files2cd
 %exclude %{_bindir}/image2cd
@@ -257,6 +259,7 @@ fi
 %{_datadir}/CDWserver/http/webCDcreator/icons/*
 %dir %{_datadir}/CDWserver/http/webCDcreator/errors
 %{_datadir}/CDWserver/http/webCDcreator/errors/*.html
+%{_datadir}/CDWserver/http/embeddedProjects.html
 %dir %attr(700, %{CDWuser}, %{CDWgroup}) %{_var}/lib/CDWserver/projects
 
 %files rcdrecord
