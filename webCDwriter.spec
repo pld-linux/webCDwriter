@@ -9,7 +9,7 @@ Summary:	Network CD Writing tool
 Summary(pl.UTF-8):	Narzędzie do sieciowego nagrywania CD
 Name:		webCDwriter
 Version:	2.8.1
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://joerghaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
@@ -118,11 +118,11 @@ fi
 # TODO use trigger if it's from older PLD package or discard
 # Since rpm will not change the owner of an existing %config file
 
-%{__chown} %{CDWuser} /etc/CDWserver/accounts 2> /dev/null || :
-%{__chown} %{CDWuser} /etc/CDWserver/config 2> /dev/null || :
-%{__chown} %{CDWuser} /etc/CDWserver/key.txt 2> /dev/null || :
-%{__chown} %{CDWuser} /etc/CDWserver/password 2> /dev/null || :
-%{__chmod} 600 /etc/CDWserver/password 2> /dev/null || :
+%{__chown} %{CDWuser} %{_sysconfdir}/accounts 2> /dev/null || :
+%{__chown} %{CDWuser} %{_sysconfdir}/config 2> /dev/null || :
+%{__chown} %{CDWuser} %{_sysconfdir}/key.txt 2> /dev/null || :
+%{__chown} %{CDWuser} %{_sysconfdir}/password 2> /dev/null || :
+%{__chmod} 600 %{_sysconfdir}/password 2> /dev/null || :
 %{__chown} %{CDWuser} %{_var}/log/CDWserver/CDinfos 2> /dev/null || :
 %{__chown} %{CDWuser} %{_var}/log/CDWserver/connects 2> /dev/null || :
 %{__chown} %{CDWuser} %{_var}/log/CDWserver/log 2> /dev/null || :
@@ -140,20 +140,19 @@ if [ -e /home/CDWserver/ ]; then
 	echo "use #rmdir /home/CDWserver/ to clear directory"
 fi
 
-
-/usr/sbin/CDWconfig.sh %{CDWuser} %{CDWgroup}
+%{_sbindir}/CDWconfig.sh %{CDWuser} %{CDWgroup}
 
 #patch and/or e-mail to program author
 #if this not set WCDwriter display error
-#/usr/sbin/CDWconfig.sh root %{CDWgroup}
+#%{_sbindir}/CDWconfig.sh root %{CDWgroup}
 #
 # if this not set WCDwriter display error
-# chown root.cdwrite /usr/bin/cdrdao
-# chmod 4750 /usr/bin/cdrdao
-# chown root.cdwrite /usr/bin/cdrecord
-# chmod 4750 /usr/bin/cdrecord
-# chown root.cdwrite /usr/bin/mkisofs
-# chmod 4750 /usr/bin/mkisofs
+# chown root.cdwrite %{_bindir}/cdrdao
+# chmod 4750 %{_bindir}/cdrdao
+# chown root.cdwrite %{_bindir}/cdrecord
+# chmod 4750 %{_bindir}/cdrecord
+# chown root.cdwrite %{_bindir}/mkisofs
+# chmod 4750 %{_bindir}/mkisofs
 
 %preun
 if [ "$1" = "0" ]; then
@@ -219,6 +218,7 @@ fi
 %attr(755,root,root) %{_sbindir}/CDWserver
 %attr(755,root,root) %{_sbindir}/CDWuseradd
 
+%dir %{_var}/lib/CDWserver
 %dir %{_var}/lib/CDWserver/export
 %{_var}/lib/CDWserver/export/*
 
