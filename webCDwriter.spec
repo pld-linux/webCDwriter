@@ -9,7 +9,7 @@ Summary:	Network CD Writing tool
 Summary(pl.UTF-8):	Narzędzie do sieciowego nagrywania CD
 Name:		webCDwriter
 Version:	2.8.1
-Release:	2
+Release:	3
 License:	GPL v2+
 Group:		Networking/Daemons
 Source0:	http://joerghaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
