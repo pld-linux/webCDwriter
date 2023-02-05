@@ -8,14 +8,15 @@
 Summary:	Network CD Writing tool
 Summary(pl.UTF-8):	Narzędzie do sieciowego nagrywania CD
 Name:		webCDwriter
-Version:	2.8.1
-Release:	3
+Version:	2.8.2
+Release:	1
 License:	GPL v2+
 Group:		Networking/Daemons
+#Source0Download: http://joerghaeger.de/webCDwriter/TARs.html
 Source0:	http://joerghaeger.de/webCDwriter/download/%{name}-%{version}.tar.bz2
-# Source0-md5:	7cf04f31507a1da96073eef2d50b65b0
+# Source0-md5:	5f353258319f2bfcc076ac327e259ad2
 Patch0:		%{name}-FHS.patch
-# Source0Download: http://joerghaeger.de/webCDwriter/TARs.html
+Patch1:		%{name}-optflags.patch
 URL:		http://JoergHaeger.de/webCDwriter/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -80,30 +81,35 @@ Zdalny klient dla webCDwritera.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
+./configure \
+	--pam \
+	--group=%{CDWgroup} \
+	--user=%{CDWuser} \
+	--port=12411 \
+	--destDir=$RPM_BUILD_ROOT \
+	--doNotCompileWebCDcreator
 
-./configure	--pam \
-		--group=%{CDWgroup} \
-		--user=%{CDWuser} \
-		--port=12411 \
-		--destDir=$RPM_BUILD_ROOT \
-		--doNotCompileWebCDcreator
+#	--nosCert= # Netscape Object Signing Certificate
+#	--sunCert= # certificate for the keytool from Sun
+#	--debug
 
-#		--nosCert= # Netscape Object Signing Certificate
-#		--sunCert= # certificate for the keytool from Sun
-#		--debug
-
-%{__make}
+%{__make} \
+	CXX="%{__cxx}" \
+	CXXFLAGS="%{rpmcxxflags} %{rpmcppflags}" \
+	LDFLAGS="%{rpmldflags} %{rpmcxxflags}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
+
 # looks like make install auto users $RPM_BUILD_ROOT?
 %{__make} install
 
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_datadir}/CDWserver}
-mv $RPM_BUILD_ROOT/etc/init.d/CDWserver $RPM_BUILD_ROOT/etc/rc.d/init.d/CDWserver
-rm $RPM_BUILD_ROOT%{_bindir}/CDWuninstall.sh
+%{__mv} $RPM_BUILD_ROOT/etc/init.d/CDWserver $RPM_BUILD_ROOT/etc/rc.d/init.d/CDWserver
+%{__rm} $RPM_BUILD_ROOT%{_bindir}/CDWuninstall.sh
 
 %clean
 if [ ! -e $RPM_BUILD_ROOT/dev/ ]; then
@@ -201,12 +207,11 @@ fi
 %dir %attr(700,%{CDWuser},%{CDWgroup}) %{_var}/log/CDWserver
 %dir %attr(700,%{CDWuser},%{CDWgroup}) %{_var}/spool/CDWserver
 %dir %{_datadir}/CDWserver
-%attr(4754, root, %{CDWgroup}) %{_bindir}/cdrecord-dummy
-%attr(4754, root, %{CDWgroup}) %{_bindir}/cdrdao-dummy
-%attr(4754, root, %{CDWgroup}) %{_bindir}/CDWrootGate
-%attr(4754, root, %{CDWgroup}) %{_bindir}/CDWverify
-%attr(4754, root, %{CDWgroup}) %{_bindir}/CDWverify-dummy
-#%attr(4754, root, %{CDWgroup}) %{_bindir}/setScheduler
+%attr(4754,root,%{CDWgroup}) %{_bindir}/cdrecord-dummy
+%attr(4754,root,%{CDWgroup}) %{_bindir}/cdrdao-dummy
+%attr(4754,root,%{CDWgroup}) %{_bindir}/CDWrootGate
+%attr(4754,root,%{CDWgroup}) %{_bindir}/CDWverify
+%attr(4754,root,%{CDWgroup}) %{_bindir}/CDWverify-dummy
 
 %attr(755,root,root) %{_bindir}/dvd+rw-format-dummy
 %attr(755,root,root) %{_bindir}/growisofs-dummy

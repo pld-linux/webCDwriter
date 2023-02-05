@@ -1,0 +1,20 @@
+--- webCDwriter-2.8.2/rcdrecord/Makefile.orig	2004-05-01 20:43:56.000000000 +0200
++++ webCDwriter-2.8.2/rcdrecord/Makefile	2023-02-05 16:36:48.043955563 +0100
+@@ -13,14 +13,14 @@ goal: rcdrecord
+ include config
+ 
+ %.o: %.cpp %.h config.h Error.h Version.h
+-	$(CXX) -c $<
++	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
+ 
+ rcdrecord.o: CommandArgs.h Client.h Client2.h Error.h \
+ 	Version.h rcdrecord.cpp
+-	$(CXX) -c rcdrecord.cpp
++	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c rcdrecord.cpp
+ 
+ rcdrecord: Client.o Client2.o rcdrecord.o
+-	$(CXX) Client.o Client2.o rcdrecord.o -o rcdrecord
++	$(CXX) $(LDFLAGS) $(CXXFLAGS) Client.o Client2.o rcdrecord.o -o rcdrecord
+ 	ln -sf rcdrecord files2cd
+ 	ln -sf rcdrecord image2cd
+ 	@echo
